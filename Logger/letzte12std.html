@@ -1,0 +1,53 @@
+<?php
+/********************************************************************************************
+  Autor:   Enrico Sadlowski                                                                 *
+  Kontakt: profwebapps@gmail.com                                                            *
+                                                                                            *
+  PROJEKT: Ausgabe der durch den Arduino generierten Temperaturwerte der letzten 12 Stunden *
+                                                                                            *
+********************************************************************************************/
+?>
+ 
+<!DOCTYPE HTML>
+<html>
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+  <meta name="viewport" content="user-scalable=yes, width=device-width"> 
+  <title>ARDUINO - Aktuelle Temperatur</title>
+</head>
+<body>
+ 
+<table>
+  <tr>
+    <td width="120">Datum</td>
+    <td width="120">Zeit</td>
+    <td width="120">Innen</td>
+    <td width="120">Außen</td>
+  </tr>
+ 
+<?php
+include("../inc/db.inc.php"); 
+ 
+$q_data  = mysql_query("SELECT DATE_FORMAT(datumzeit,'%d.%m.%Y') AS DATUM, DATE_FORMAT(datumzeit,'%H:%i') AS ZEIT, temp1, temp2 FROM arduino_temperaturen WHERE `datumzeit` >= date_sub(now(), interval 12 hour) AND `datumzeit` <= now()  GROUP BY DATE_FORMAT(datumzeit, '%Y-%m-%d %H') ORDER BY datumzeit DESC") or die(mysql_error());
+if(mysql_num_rows($q_data) > 0)
+{
+  while($r_data = mysql_fetch_array($q_data))
+  {
+    echo "<tr>\n";
+    echo "  <td>".$r_data['DATUM']."</td>\n";
+    echo "  <td>".$r_data['ZEIT']."</td>\n";
+    echo "  <td>".number_format($r_data['temp1'], 2, '.', '')."°C</td>\n";
+    echo "  <td>".number_format($r_data['temp2'], 2, '.', '')."°C</td>\n";
+    echo "</tr>\n";
+  }
+}
+else
+{
+  $E = 1;
+  $M = "Es wurden keine Temperaturwerte in der Datenbank gefunden!";
+}
+?>
+ 
+    </table>
+  </body>
+</html>

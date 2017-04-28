@@ -1,0 +1,57 @@
+<?php
+/***********************************************************************************
+  Autor:   Enrico Sadlowski                                                        *
+  Kontakt: profwebapps@gmail.com                                                   *
+                                                                                   *
+  PROJEKT: Ausgabe des durch den ARDUINO zuletzt generierten Temperaturwertes      *
+                                                                                   *
+***********************************************************************************/
+ 
+include("../inc/db.inc.php"); 
+ 
+$q_data  = mysql_query("SELECT DATE_FORMAT(datumzeit,'%d.%m.%Y') AS DATUM, DATE_FORMAT(datumzeit,'%H:%i') AS ZEIT, temp1, temp2 
+                        FROM arduino_temperaturen ORDER BY datumzeit DESC LIMIT 1") or die(mysql_error());
+if(mysql_num_rows($q_data) > 0)
+{
+  $r_data = mysql_fetch_array($q_data);
+  $DATUM  = $r_data['DATUM'];
+  $temp1  = number_format($r_data['temp1'], 2, '.', '');
+  $temp2  = number_format($r_data['temp2'], 2, '.', '');
+  $ZEIT   = $r_data['ZEIT']; 
+}
+else
+{
+  $E = 1;
+  $M = "Es wurden keine Temperaturwerte in der Datenbank gefunden!";
+}
+?>
+ 
+<!DOCTYPE HTML>
+<html>
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+  <meta name="viewport" content="user-scalable=yes, width=device-width"> 
+  <title>ARDUINO - Aktuelle Temperatur</title>
+</head>
+<body>
+ 
+<?php
+//Wenn Daten in der Datenbank gefunden wurden, diese ausgeben
+if(!isset($E)) 
+{
+?>
+  <h2>Letzter gespeicherter Temperatur-Messwert</h2>
+  <h3><?php echo $DATUM.", ".$ZEIT." Uhr";?></h3>
+  Innen: <?php echo $temp1;?>°C
+  Außen:<?php echo $temp2;?>°C
+<?php           
+} 
+else 
+{
+// Meldung ausgeben wenn noch keine Daten in der Datenbank stehen 
+  echo $M;
+}
+?>   
+ 
+  </body>
+</html>
