@@ -1,6 +1,8 @@
 #include <LiquidCrystal.h>
 #include <DallasTemperature.h>
 #include <OneWire.h>
+#include <SPI.h>
+#include <Ethernet.h>   
 
 // --------- LCD Display ---------
 LiquidCrystal lcd(9, 8, 6, 5, 4, 3);
